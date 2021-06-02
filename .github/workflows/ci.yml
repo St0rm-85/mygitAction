@@ -1,4 +1,4 @@
-name: CI/CD Testing
+name: Super-Linter
 
 on: push
 
@@ -10,7 +10,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run CI/CD Testing
+      - name: Run Super-Linter
         uses: github/super-lint@v3
         env:
           DEFAULT_BRANCH: main
