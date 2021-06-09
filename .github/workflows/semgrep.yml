@@ -11,8 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: returntocorp/semgrep-rules-test-action@master
+    - name: test
+      id : test
+      uses: returntocorp/semgrep-rules-test-action@master
+    - uses: actions/upload-artifact@v1
+      if: always()
       with:
-        auditOn: push
-        publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
-        publishDeployment: 1214
+        name: tests
+        path: ${{ steps.test.outputs.output_dir }}
