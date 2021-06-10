@@ -1,65 +1,32 @@
-import boto3
-from boto3 import client
+"""tests for the 'fabric' package (v2.x)
+Most of these examples are taken from the fabric documentation: http://docs.fabfile.org/en/2.5/getting-started.html
+See fabric-LICENSE for its' license.
+"""
 
-# ruleid:hardcoded-token
-client("s3", aws_secret_access_key="jWnyxxxxxxxxxxxxxxxxX7ZQxxxxxxxxxxxxxxxx")
+from fabric import Connection
 
-# ruleid:hardcoded-token
-boto3.sessions.Session(aws_secret_access_key="jWnyxxxxxxxxxxxxxxxxX7ZQxxxxxxxxxxxxxxxx")
+c = Connection('web1')
+result = c.run('uname -s')
 
-s = boto3.sessions
-# ruleid:hardcoded-token
-s.Session(aws_access_key_id="AKIAxxxxxxxxxxxxxxxx")
+c.run(command='echo run with kwargs')
 
-uhoh_key = "AKIAxxxxxxxxxxxxxxxx"
-ok_secret = os.environ.get("SECRET_ACCESS_KEY")
-# ruleid:hardcoded-token
-s3 = boto3.resource(
-    "s3",
-    aws_access_key_id=uhoh_key,
-    aws_secret_access_key=ok_secret,
-    region_name="sfo2",
-    endpoint_url="https://sfo2.digitaloceanspaces.com",
-)
 
-ok_key = os.environ.get("ACCESS_KEY_ID")
+from fabric import SerialGroup as Group
+results = Group('web1', 'web2', 'mac1').run('uname -s')
 
-uhoh_secret = "jWnyxxxxxxxxxxxxxxxxX7ZQxxxxxxxxxxxxxxxx"
-# ruleid:hardcoded-token
-s3 = boto3.resource(
-    "s3",
-    aws_access_key_id=ok_key,
-    aws_secret_access_key=uhoh_secret,
-    region_name="sfo2",
-    endpoint_url="https://sfo2.digitaloceanspaces.com",
-)
 
-# ok:hardcoded-token
-s3 = client("s3", aws_access_key_id="this-is-not-a-key")
+from fabric import SerialGroup as Group
+pool = Group('web1', 'web2', 'web3')
+pool.run('ls')
 
-# ok:hardcoded-token
-s3 = boto3.resource(
-    "s3",
-    aws_access_key_id="XXXXXXXX",
-    aws_secret_access_key="----------------",
-    region_name="us-east-1",
-)
 
-# ok:hardcoded-token
-s3 = boto3.resource(
-    "s3",
-    aws_access_key_id="<your token here>",
-    aws_secret_access_key="<your secret here>",
-    region_name="us-east-1",
-)
 
-# ok:hardcoded-token
-key = os.environ.get("ACCESS_KEY_ID")
-secret = os.environ.get("SECRET_ACCESS_KEY")
-s3 = boto3.resource(
-    "s3",
-    aws_access_key_id=key,
-    aws_secret_access_key=secret,
-    region_name="sfo2",
-    endpoint_url="https://sfo2.digitaloceanspaces.com",
-)
+# using the 'fab' command-line tool
+
+from fabric import task
+
+@task
+def upload_and_unpack(c):
+    if c.run('test -f /opt/mydata/myfile', warn=True).failed:
+        c.put('myfiles.tgz', '/opt/mydata')
+        c.run('tar -C /opt/mydata -xzvf /opt/mydata/myfiles.tgz')
