@@ -21,9 +21,6 @@ pool.run('ls')
 
 
 
-
-
-
 # using the 'fab' command-line tool
 
 from fabric import task
